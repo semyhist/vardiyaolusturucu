@@ -651,24 +651,24 @@ export default function ShiftPlannerPage() {
         const type = assign ? assign.shiftType : 'off';
         
         let label = 'İzin';
-        let bgColor = '#edf2f7'; // soft gray
-        let textColor = '#4a5568';
+        let bgColor = '#f3f4f6'; // gray-100
+        let textColor = '#374151'; // gray-700
         let isBold = 'normal';
 
         if (type === 'morning') {
           label = `${settings.morning.start} - ${settings.morning.end}`;
-          bgColor = '#c6f6d5'; // emerald
-          textColor = '#1c452e';
+          bgColor = '#059669'; // strong emerald green
+          textColor = '#ffffff'; // white
           isBold = 'bold';
         } else if (type === 'afternoon') {
           label = `${settings.afternoon.start} - ${settings.afternoon.end}`;
-          bgColor = '#fef08a'; // yellow
-          textColor = '#744210';
+          bgColor = '#d97706'; // strong amber orange
+          textColor = '#ffffff'; // white
           isBold = 'bold';
         } else if (type === 'night') {
           label = `${settings.night.start} - ${settings.night.end}`;
-          bgColor = '#18181b'; // zinc black
-          textColor = '#ffffff';
+          bgColor = '#111827'; // pure dark gray / black
+          textColor = '#ffffff'; // white
           isBold = 'bold';
         }
 
@@ -770,19 +770,10 @@ export default function ShiftPlannerPage() {
       return `${dayStr}.${monthStr}.${selectedYear}`;
     });
 
-    const tableWidth = 180 + monthDays.length * 140;
-
-    const colGroupHtml = `
-      <colgroup>
-        <col width="180" style="mso-width-source:userset;width:135pt;" />
-        ${monthDays.map(() => `<col width="140" style="mso-width-source:userset;width:105pt;" />`).join('')}
-      </colgroup>
-    `;
-
     const headersHtml = `
-      <tr style="background-color: #f1f3f4; height: 25pt;">
-        <th width="180" style="mso-width-source:userset;width:135pt;min-width:180px;border:1px solid #a1a1aa;padding:6px 10px;text-align:left;font-weight:bold;background-color:#f1f3f4;color:#202124;font-family:'Segoe UI',Calibri,Arial,sans-serif;font-size:10pt;white-space:nowrap;">Çalışan</th>
-        ${realDates.map(date => `<th width="140" style="mso-width-source:userset;width:105pt;min-width:140px;border:1px solid #a1a1aa;padding:6px 10px;text-align:center;font-weight:bold;background-color:#f1f3f4;color:#202124;font-family:'Segoe UI',Calibri,Arial,sans-serif;font-size:10pt;white-space:nowrap;">${date}</th>`).join('')}
+      <tr style="background-color: #f1f3f4;">
+        <th style="border:1px solid #a1a1aa;padding:6px 10px;text-align:left;font-weight:bold;background-color:#f1f3f4;color:#202124;font-family:'Segoe UI',Calibri,Arial,sans-serif;font-size:10pt;white-space:nowrap;">Çalışan</th>
+        ${realDates.map(date => `<th style="border:1px solid #a1a1aa;padding:6px 10px;text-align:center;font-weight:bold;background-color:#f1f3f4;color:#202124;font-family:'Segoe UI',Calibri,Arial,sans-serif;font-size:10pt;white-space:nowrap;">${date}</th>`).join('')}
       </tr>
     `;
 
@@ -792,37 +783,37 @@ export default function ShiftPlannerPage() {
         const type = assign ? assign.shiftType : 'off';
         
         let label = 'İzin';
-        let bgColor = '#edf2f7';
-        let textColor = '#4a5568';
+        let bgColor = '#f3f4f6';
+        let textColor = '#374151';
         let isBold = 'normal';
 
         if (type === 'morning') {
           label = `${settings.morning.start} - ${settings.morning.end}`;
-          bgColor = '#c6f6d5';
-          textColor = '#1c452e';
+          bgColor = '#059669';
+          textColor = '#ffffff';
           isBold = 'bold';
         } else if (type === 'afternoon') {
           label = `${settings.afternoon.start} - ${settings.afternoon.end}`;
-          bgColor = '#fef08a';
-          textColor = '#744210';
+          bgColor = '#d97706';
+          textColor = '#ffffff';
           isBold = 'bold';
         } else if (type === 'night') {
           label = `${settings.night.start} - ${settings.night.end}`;
-          bgColor = '#18181b';
+          bgColor = '#111827';
           textColor = '#ffffff';
           isBold = 'bold';
         }
 
         return `
-          <td width="140" style="mso-width-source:userset;width:105pt;min-width:140px;border:1px solid #a1a1aa;padding:6px 10px;text-align:center;font-weight:${isBold};background-color:${bgColor};color:${textColor};font-family:'Segoe UI',Calibri,Arial,sans-serif;font-size:10pt;white-space:nowrap;">
+          <td style="border:1px solid #a1a1aa;padding:6px 10px;text-align:center;font-weight:${isBold};background-color:${bgColor};color:${textColor};font-family:'Segoe UI',Calibri,Arial,sans-serif;font-size:10pt;white-space:nowrap;">
             ${label}
           </td>
         `;
       }).join('');
 
       return `
-        <tr style="height: 25pt;">
-          <td width="180" style="mso-width-source:userset;width:135pt;min-width:180px;border:1px solid #a1a1aa;padding:6px 10px;text-align:left;font-weight:bold;background-color:#ffffff;color:#202124;font-family:'Segoe UI',Calibri,Arial,sans-serif;font-size:10pt;white-space:nowrap;">
+        <tr>
+          <td style="border:1px solid #a1a1aa;padding:6px 10px;text-align:left;font-weight:bold;background-color:#ffffff;color:#202124;font-family:'Segoe UI',Calibri,Arial,sans-serif;font-size:10pt;white-space:nowrap;">
             ${emp.name}
           </td>
           ${cellsHtml}
@@ -852,8 +843,7 @@ export default function ShiftPlannerPage() {
         <![endif]-->
       </head>
       <body>
-        <table style="border-collapse:collapse;table-layout:fixed;width:${tableWidth}px;" width="${tableWidth}">
-          ${colGroupHtml}
+        <table style="border-collapse:collapse;">
           <thead>
             ${headersHtml}
           </thead>
