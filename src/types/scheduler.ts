@@ -14,6 +14,14 @@ export interface ShiftSettings {
 export interface Employee {
   id: string;
   name: string;
+  isNightRestricted?: boolean; // Gece vardiyası yasak mı?
+}
+
+export interface EmployeePreference {
+  employeeId: string;
+  dayIndex: number; // 0 ile N-1 arası
+  preferenceType: 'preferred' | 'disliked';
+  shiftType: ShiftType;
 }
 
 export interface ShiftAssignment {

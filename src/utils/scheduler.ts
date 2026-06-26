@@ -5,7 +5,8 @@ import {
   ShiftAssignment, 
   OHSConfig, 
   DAYS_OF_WEEK,
-  MonthDay
+  MonthDay,
+  EmployeePreference
 } from '../types/scheduler';
 
 /**
@@ -161,7 +162,8 @@ export function autoPlanShifts(
   settings: ShiftSettings,
   ohsConfig: OHSConfig,
   requirements: Record<Exclude<ShiftType, 'off'>, number>,
-  monthDays: MonthDay[]
+  monthDays: MonthDay[],
+  preferences?: EmployeePreference[]
 ): ShiftAssignment[] | null {
   if (employees.length === 0 || monthDays.length === 0) return [];
 
@@ -192,6 +194,14 @@ export function autoPlanShifts(
   ): boolean {
     if (shift === 'off') {
       return true;
+    }
+
+    // Gece Vardiyası Kısıtlaması (Özel Durum)
+    if (shift === 'night') {
+      const emp = employees.find((e) => e.id === employeeId);
+      if (emp?.isNightRestricted) {
+        return false;
+      }
     }
 
     // 1. Günlük Çalışma Süresi Sınırı
@@ -382,9 +392,26 @@ export function autoPlanShifts(
           });
         }
       });
+      
+      let score = calculateFatigueScore(emp.id, currentAssignments, day);
+      
+      // Tercihleri (soft kısıt) heuristic olarak hesaba kat
+      if (preferences) {
+        const pref = preferences.find(p => p.employeeId === emp.id && p.dayIndex === day);
+        if (pref) {
+          if (pref.preferenceType === 'preferred' && pref.shiftType === currentShiftType) {
+            score -= 100; // Önceliklendir
+          } else if (pref.preferenceType === 'disliked' && pref.shiftType === currentShiftType) {
+            score += 100; // Ertele
+          } else if (pref.preferenceType === 'preferred' && pref.shiftType === 'off') {
+            score += 80;  // İzin isteyen kişiye vardiya vermeyi ertele
+          }
+        }
+      }
+
       return {
         emp,
-        score: calculateFatigueScore(emp.id, currentAssignments, day)
+        score
       };
     });
 
@@ -431,7 +458,7 @@ export function autoPlanShifts(
 export interface OHSViolation {
   employeeId?: string;
   dayIndex?: number;
-  type: 'rest_period' | 'weekly_off' | 'night_limit' | 'consecutive_night' | 'shift_requirement';
+  type: 'rest_period' | 'weekly_off' | 'night_limit' | 'consecutive_night' | 'shift_requirement' | 'weekly_hours_limit' | 'special_restriction' | 'holiday_warning';
   message: string;
 }
 
@@ -441,7 +468,8 @@ export function checkScheduleViolations(
   settings: ShiftSettings,
   ohsConfig: OHSConfig,
   requirements: Record<Exclude<ShiftType, 'off'>, number>,
-  monthDays: MonthDay[]
+  monthDays: MonthDay[],
+  publicHolidays?: number[]
 ): OHSViolation[] {
   const violations: OHSViolation[] = [];
   const totalDays = monthDays.length;
@@ -485,6 +513,26 @@ export function checkScheduleViolations(
       if (shift === 'off') {
         offDaysByWeek[weekIdx]++;
         continue;
+      }
+
+      // Gece Vardiyası Kısıtlaması (Özel Durum)
+      if (shift === 'night' && emp.isNightRestricted) {
+        violations.push({
+          employeeId: emp.id,
+          dayIndex: d,
+          type: 'special_restriction',
+          message: `${emp.name}: Gece vardiyası yasaktır (Özel durum).`
+        });
+      }
+
+      // Resmi Tatil Çalışma Uyarısı
+      if (publicHolidays && publicHolidays.includes(monthDays[d].date)) {
+        violations.push({
+          employeeId: emp.id,
+          dayIndex: d,
+          type: 'holiday_warning',
+          message: `${emp.name}: ${monthDays[d].formattedLabel} resmi tatil gününde çalışıyor. Çift yevmiye veya ek izin verilmelidir.`
+        });
       }
 
       // 2. Günlük çalışma süresi sınırı
@@ -542,6 +590,26 @@ export function checkScheduleViolations(
           employeeId: emp.id,
           type: 'weekly_off',
           message: `${emp.name}: ${w + 1}. takvim haftasında en az ${required} gün izin yapmalıdır (Mevcut: ${actual} gün).`
+        });
+      }
+    });
+
+    // 45 Saat Kuralı Kontrolü
+    weekIndices.forEach(w => {
+      let weeklyHours = 0;
+      for (let d = 0; d < totalDays; d++) {
+        if (monthDays[d].weekIndex === w) {
+          const shift = empGrid[d];
+          if (shift !== 'off') {
+            weeklyHours += getShiftDuration(settings[shift].start, settings[shift].end);
+          }
+        }
+      }
+      if (weeklyHours > 45) {
+        violations.push({
+          employeeId: emp.id,
+          type: 'weekly_hours_limit',
+          message: `${emp.name}: ${w + 1}. takvim haftasında toplam çalışma süresi (${weeklyHours.toFixed(1)} saat), 45 saat yasal sınırını aşıyor!`
         });
       }
     });
