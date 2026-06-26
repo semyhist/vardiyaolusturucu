@@ -640,7 +640,7 @@ export default function ShiftPlannerPage() {
 
     const headersHtml = `
       <tr style="background-color: #f1f3f4; height: 25pt;">
-        <th class="cell-header" width="180" style="mso-width-source:userset;width:135pt;min-width:180px;border:1px solid #a1a1aa;padding:6px 10px;text-align:left;font-weight:bold;background-color:#f1f3f4;color:#202124;font-family:'Segoe UI',Calibri,Arial,sans-serif;font-size:10pt;white-space:nowrap;">Çalışan</th>
+        <th class="cell-header" width="180" style="mso-width-source:userset;width:135pt;min-width:180px;border:1px solid #a1a1aa;padding:6px 10px;text-align:left;font-weight:bold;background-color:#f1f3f4;color:#202124;font-family:'Segoe UI',Calibri,Arial,sans-serif;font-size:10pt;white-space:nowrap;"></th>
         ${realDates.map(date => `<th class="cell-header" width="140" style="mso-width-source:userset;width:105pt;min-width:140px;border:1px solid #a1a1aa;padding:6px 10px;text-align:center;font-weight:bold;background-color:#f1f3f4;color:#202124;font-family:'Segoe UI',Calibri,Arial,sans-serif;font-size:10pt;white-space:nowrap;">${date}</th>`).join('')}
       </tr>
     `;
@@ -772,7 +772,7 @@ export default function ShiftPlannerPage() {
 
     const headersHtml = `
       <tr style="background-color: #f1f3f4;">
-        <th style="border:1px solid #a1a1aa;padding:6px 10px;text-align:left;font-weight:bold;background-color:#f1f3f4;color:#202124;font-family:'Segoe UI',Calibri,Arial,sans-serif;font-size:10pt;white-space:nowrap;">Çalışan</th>
+        <th style="border:1px solid #a1a1aa;padding:6px 10px;text-align:left;font-weight:bold;background-color:#f1f3f4;color:#202124;font-family:'Segoe UI',Calibri,Arial,sans-serif;font-size:10pt;white-space:nowrap;"></th>
         ${realDates.map(date => `<th style="border:1px solid #a1a1aa;padding:6px 10px;text-align:center;font-weight:bold;background-color:#f1f3f4;color:#202124;font-family:'Segoe UI',Calibri,Arial,sans-serif;font-size:10pt;white-space:nowrap;">${date}</th>`).join('')}
       </tr>
     `;
